@@ -22,7 +22,7 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(
   cors({
     credentials: true,
-    origin: "https://airbnbclone-3off.onrender.com"||"http://localhost:3000",
+    origin: ["https://airbnbclone-3off.onrender.com","http://airbnbclone-3off.onrender.com"],
   })
 );
 app.use(CookieParser());
