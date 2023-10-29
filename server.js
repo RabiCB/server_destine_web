@@ -18,7 +18,7 @@ const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const fs = require("fs");
 app.use("/uploads", express.static(__dirname + "/uploads"));
-const allowedOrigin = 'https://airbnbclone-3off.onrender.com';
+const allowedOrigin = 'https://getit-two.vercel.app/';
 app.use(
   cors({
     origin: allowedOrigin,
@@ -29,7 +29,7 @@ app.use(
 app.use(CookieParser());
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://airbnbclone-3off.onrender.com');
+  res.setHeader('Access-Control-Allow-Origin', 'https://getit-two.vercel.app/');
  
 
   next();
