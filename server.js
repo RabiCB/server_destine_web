@@ -18,11 +18,12 @@ const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const fs = require("fs");
 app.use("/uploads", express.static(__dirname + "/uploads"));
-
+const allowedOrigin = 'https://airbnbclone-3off.onrender.com';
 app.use(
   cors({
-    credentials: true,
-    origin: ["https://airbnbclone-3off.onrender.com","http://airbnbclone-3off.onrender.com"],
+    origin: allowedOrigin,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
   })
 );
 app.use(CookieParser());
