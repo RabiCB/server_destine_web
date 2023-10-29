@@ -19,14 +19,21 @@ const multer = require("multer");
 const fs = require("fs");
 app.use("/uploads", express.static(__dirname + "/uploads"));
 const allowedOrigin = 'https://airbnbclone-3off.onrender.com';
-// app.use(
-//   cors({
-//     origin: allowedOrigin,
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: allowedOrigin,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  })
+);
 app.use(CookieParser());
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://airbnbclone-3off.onrender.com');
+ 
+
+  next();
+});
 
 mongoose
   .connect(process.env.MONGO_URL, {
