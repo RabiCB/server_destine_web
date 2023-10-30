@@ -18,7 +18,7 @@ const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const fs = require("fs");
 app.use("/uploads", express.static(__dirname + "/uploads"));
-const allowedOrigin = 'https://getit-two.vercel.app';
+const allowedOrigin = ['https://getit-two.vercel.app','http://localhost:3000'];
 app.use(
   cors({
     origin: allowedOrigin,
