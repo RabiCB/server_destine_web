@@ -74,10 +74,10 @@ app.post("/login", async (req, res) => {
         }
       );
     } else {
-      res.json("pass incorrect");
+      res.json("Invalid Password");
     }
   } else {
-    res.status(422).json("not found");
+    res.status(422).json("Please enter valid email");
   }
 });
 app.get("/profile", (req, res) => {
