@@ -77,7 +77,7 @@ app.post("/login", async (req, res) => {
       res.json("Invalid Password");
     }
   } else {
-    res.status(422).json("Please enter valid email");
+    res.status(422).json("Invalid Credentials");
   }
 });
 app.get("/profile", (req, res) => {
