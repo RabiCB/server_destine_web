@@ -173,7 +173,7 @@ app.get("/allplaces", async (req, res) => {
 
 
 app.get('/search/:key',async(req,res)=>{
-  const data=await Place.find({
+  const filterdata=await Place.find({
     '$or':[
       {
         title:{
@@ -193,6 +193,8 @@ app.get('/search/:key',async(req,res)=>{
       }
     ]
   })
+
+  res.json(filterdata)
 })
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
