@@ -169,17 +169,11 @@ app.get("/places/:id", async (req, res) => {
 
 app.get("/allplaces", async (req, res) => {
   try {
-		const page = parseInt(req.query.page) - 1 || 0;
-		const limit = parseInt(req.query.limit) || 5;
+		
+		
 		const search = req.query.search || "";
-		req.query.sort ? (sort = req.query.sort.split(",")) : (sort = [sort]);
+		
 
-		let sortBy = {};
-		if (sort[1]) {
-			sortBy[sort[0]] = sort[1];
-		} else {
-			sortBy[sort[0]] = "asc";
-		}
 
 		const place = await Place.find({ title: { $regex: search, $options: "i" } })
 			.sort(sortBy)
@@ -191,10 +185,7 @@ app.get("/allplaces", async (req, res) => {
 		});
 
 		const response = {
-			error: false,
-			totalpage,
-			page: page + 1,
-			limit,
+			
 			place,
 		};
 
