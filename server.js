@@ -174,20 +174,12 @@ app.get("/allplaces", async (req, res) => {
 
 app.get("/search/:key",async(req,res)=>{
   const filterdata= await Place.find({   
-    $or:
-    [
-        { 
-            'title': { 
-                '$regex': req.params.key + '.*', '$options': 'i' 
-             }
-        },
-        { 
-            'price': { 
-                '$regex': req.params.key + '.*', '$options': 'i'  
-            }
-        }
-    ]
-
+        title:{
+          $regex:req.params.key,
+          $caseSensitive: true
+          
+        }   
+      
   })
 
   res.json(filterdata)
