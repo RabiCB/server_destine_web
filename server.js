@@ -172,18 +172,22 @@ app.get("/allplaces", async (req, res) => {
 });
 
 
-app.get("/search/:key",async(req,res)=>{
+app.get("/search",async(req,res)=>{
+  const searchquery=req.params.query
   const filterdata= await Place.find({
+    $text:{
+      $search:searchquery
+    }
+  }
+    
+  
     
       
-        title:{
-          $regex:req.params.key
-          
-        }
+        
       
        
       
-  })
+  )
 
   res.json(filterdata)
 })
