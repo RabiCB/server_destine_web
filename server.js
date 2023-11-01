@@ -176,6 +176,7 @@ app.get("/search/:key",async(req,res)=>{
   const filterdata= await Place.find({   
         title:{
           $regex:req.params.key,
+          $options: "i" 
          
           
         }   
