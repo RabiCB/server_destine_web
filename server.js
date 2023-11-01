@@ -166,19 +166,8 @@ app.get("/places/:id", async (req, res) => {
 });
 
 app.get("/allplaces", async (req, res) => {
-   try{
-    const userQuery = await req.query;
-        const filteredPlace = await Place.filter((info)=>{
-            let isValid = true;
-            for(key in userQuery) {
-                isValid = isValid && info[key] === userQuery[key];
-            }
-            return isValid;
-        });
-        res.json({data: filteredPlace})
-  }catch(err){
-    res.send(err.message)
-  }
+  const allplaces = await Place.find();
+  res.json(allplaces);
 });
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
