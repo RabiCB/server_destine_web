@@ -166,14 +166,14 @@ app.get("/places/:id", async (req, res) => {
 });
 
 app.get("/allplaces", async (req, res) => {
-  const search =req.query.q
+  
   const allplaces = await Place.find();
   res.json(allplaces);
 });
 
 
-app.get('/search/:key',async(req,res)=>{
-  const filterdata=await Place.find({
+app.get("/search/:key",async(req,res)=>{
+  const filterdata= await Place.find({
     '$or':[
       {
         title:{
@@ -194,7 +194,7 @@ app.get('/search/:key',async(req,res)=>{
     ]
   })
 
-  res.send(filterdata)
+  res.json(filterdata)
 })
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
