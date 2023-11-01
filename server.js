@@ -181,21 +181,21 @@ app.get("/allplaces", async (req, res) => {
 			sortBy[sort[0]] = "asc";
 		}
 
-		const movies = await Place.find({ title: { $regex: search, $options: "i" } })
+		const place = await Place.find({ title: { $regex: search, $options: "i" } })
 			.sort(sortBy)
 			.skip(page * limit)
 			.limit(limit);
 
-		const total = await Place.countDocuments({
+		const totalpage = await Place.countDocuments({
 			title: { $regex: search, $options: "i" },
 		});
 
 		const response = {
 			error: false,
-			total,
+			totalpage,
 			page: page + 1,
 			limit,
-			movies,
+			place,
 		};
 
 		res.status(200).json(response);
