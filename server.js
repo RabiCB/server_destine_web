@@ -194,7 +194,7 @@ app.get('/search/:key',async(req,res)=>{
     ]
   })
 
-  res.json(filterdata)
+  res.send(filterdata)
 })
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
