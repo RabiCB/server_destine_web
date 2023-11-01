@@ -165,6 +165,8 @@ app.get("/places/:id", async (req, res) => {
   res.json(await Place.findById(id));
 });
 
+
+
 app.get("/allplaces", async (req, res) => {
   const allplaces = await Place.find();
   res.json(allplaces);
@@ -172,6 +174,18 @@ app.get("/allplaces", async (req, res) => {
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
   res.json(await Place.findById(id));
+});
+
+
+app.get('/search', async (req, res) => {
+  const searchQuery = req.query.q; // Get the search query from the request query parameters
+
+ 
+  
+  // Perform a search query based on your criteria
+  const result = await Place.find({ $text: { $search: searchQuery } }).toArray();
+
+  res.json(result);
 });
 
 function getUserDatafromreq(req){
