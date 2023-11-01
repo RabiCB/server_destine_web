@@ -165,43 +165,39 @@ app.get("/places/:id", async (req, res) => {
   res.json(await Place.findById(id));
 });
 
-
-
 app.get("/allplaces", async (req, res) => {
-  try {
-		
-		
-		const search = req.query.search || "";
-		
-
-
-		const place = await Place.find({ title: { $regex: search, $options: "i" } })
-			.sort(sortBy)
-			.skip(page * limit)
-			.limit(limit);
-
-		const totalpage = await Place.countDocuments({
-			title: { $regex: search, $options: "i" },
-		});
-
-		const response = {
-			
-			place,
-		};
-
-		res.status(200).json(response);
-	} catch (err) {
-		console.log(err);
-		res.status(500).json({ error: true, message: "Internal Server Error" });
-	}
+  const search =req.query.q
+  const allplaces = await Place.find();
+  res.json(allplaces);
 });
+
+
+app.get('/search/:key',async(req,res)=>{
+  const data=await Place.find({
+    '$or':[
+      {
+        title:{
+          $regex:req.params.key
+          
+        }
+      }, {
+        address:{
+          $regex:req.params.key
+          
+        }
+      }, {
+        price:{
+          $regex:req.params.key
+          
+        }
+      }
+    ]
+  })
+})
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
   res.json(await Place.findById(id));
 });
-
-
-
 
 function getUserDatafromreq(req){
     return new Promise((resolve,reject)=>{
