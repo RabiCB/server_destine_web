@@ -168,8 +168,41 @@ app.get("/places/:id", async (req, res) => {
 
 
 app.get("/allplaces", async (req, res) => {
-  const allplaces = await Place.find();
-  res.json(allplaces);
+  try {
+		const page = parseInt(req.query.page) - 1 || 0;
+		const limit = parseInt(req.query.limit) || 5;
+		const search = req.query.search || "";
+		req.query.sort ? (sort = req.query.sort.split(",")) : (sort = [sort]);
+
+		let sortBy = {};
+		if (sort[1]) {
+			sortBy[sort[0]] = sort[1];
+		} else {
+			sortBy[sort[0]] = "asc";
+		}
+
+		const movies = await Place.find({ title: { $regex: search, $options: "i" } })
+			.sort(sortBy)
+			.skip(page * limit)
+			.limit(limit);
+
+		const total = await Place.countDocuments({
+			title: { $regex: search, $options: "i" },
+		});
+
+		const response = {
+			error: false,
+			total,
+			page: page + 1,
+			limit,
+			movies,
+		};
+
+		res.status(200).json(response);
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: true, message: "Internal Server Error" });
+	}
 });
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
@@ -177,16 +210,7 @@ app.get("/accomodation/:id", async (req, res) => {
 });
 
 
-app.get('/search', async (req, res) => {
-  const searchQuery = req.query.q; // Get the search query from the request query parameters
 
- 
-  
-  // Perform a search query based on your criteria
-  const result = await Place.find({ $text: { $search: searchQuery } }).toArray();
-
-  res.json(result);
-});
 
 function getUserDatafromreq(req){
     return new Promise((resolve,reject)=>{
