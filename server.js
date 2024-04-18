@@ -17,6 +17,7 @@ const jwtsecret = "stehbdj/gdgi/srbdhfi";
 const imageDownloader = require("image-downloader");
 const multer = require("multer");
 const fs = require("fs");
+const { error } = require("console");
 app.use("/uploads", express.static(__dirname + "/uploads"));
 const allowedOrigin = ['https://getit-two.vercel.app','http://localhost:3000'];
 app.use(
@@ -26,12 +27,11 @@ app.use(
   credentials: true,
   })
 );
+
 app.use(CookieParser());
 
-
-
 mongoose
-  .connect(process.env.MONGO_URL, {
+  .connect("mongodb+srv://airhnb:rabinbhn@cluster0.vf0pbbi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     autoIndex: true,
@@ -70,7 +70,11 @@ app.post("/login", async (req, res) => {
         {},
         (err, token) => {
           if (err) throw err;
-          res.header("token", token).json(userDoc);
+          res.json({
+            token,
+            user:userDoc
+          })
+
         }
       );
     } else {
@@ -80,16 +84,21 @@ app.post("/login", async (req, res) => {
     res.status(422).json("not found");
   }
 });
-app.get("/profile", (req, res) => {
-  const { token } = req.cookies;
+app.get('/profile', async (req, res) => {
+  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
+
   if (token) {
-    jwt.verify(token, jwtsecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const { name, email, _id } = await User.findById(userData.id);
-      res.json({ name, email, _id });
-    });
+      try {
+          const userData = jwt.verify(token, jwtsecret);
+          const { name, email, _id } = await User.findById(userData.id);
+          res.json({ name, email, _id });
+      } catch (error) {
+          console.error(error); // Log the error
+          res.status(401).json({ error: 'Invalid or expired token' });
+      }
   } else {
-    res.json(null);
+      // If no token is provided, proceed without authentication
+      res.json({ message: 'No token provided, proceeding without authentication' });
   }
 });
 
@@ -119,9 +128,21 @@ app.post("/upload", photoMiddleware.array("photos", 100), (req, res) => {
   }
   res.json(uploadFiles);
 });
+function  getUserDatafromreq(req) {
+
+  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
+
+
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, jwtsecret, {}, async (err, userData) => {
+      if (err) throw err;
+      resolve(userData);
+    });
+  });
+}
 
 app.post("/places", async (req, res) => {
-  const { token } = req.cookies;
+  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
   const {
     title,
     address,
@@ -151,12 +172,13 @@ app.post("/places", async (req, res) => {
     });
     res.json(placeDoc);
   });
-});
+}); 
 app.get("/userplaces", (req, res) => {
-  const { token } = req.cookies;
+  const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
   jwt.verify(token, jwtsecret, {}, async (err, userData) => {
-    const { id } = userData;
-    res.json(await Place.find({ owner: id }));
+    // const { id } = userData; 
+    console.log(userData)
+    // res.json(await Place.find({ owner: id }));
   });
 });
 
@@ -166,48 +188,31 @@ app.get("/places/:id", async (req, res) => {
 });
 
 app.get("/allplaces", async (req, res) => {
-  
   const allplaces = await Place.find();
   res.json(allplaces);
 });
 
+app.get("/search/:key", async (req, res) => {
+  const filterdata = await Place.find({
+    title: {
+      $regex: req.params.key,
+      $options: "i",
+    },
+  });
 
-app.get("/search/:key",async(req,res)=>{
-  const filterdata= await Place.find({   
-        title:{
-          $regex:req.params.key,
-          $options: "i" 
-         
-          
-        }   
-      
-  })
-
-  res.json(filterdata)
-})
+  res.json(filterdata);
+});
 app.get("/accomodation/:id", async (req, res) => {
   const { id } = req.params;
   res.json(await Place.findById(id));
 });
 
-function getUserDatafromreq(req){
-    return new Promise((resolve,reject)=>{
-      jwt.verify(req.cookies.token, jwtsecret, {}, async (err, userData) => {
-        if (err) throw err
-        resolve(userData)
-  
-        
-      });
-
-    })
-    
-}
 
 
-app.post("/booking", async(req,res) => {
-  const userData=await getUserDatafromreq(req);
+app.post("/booking", async (req, res) => {
+  const userData = await getUserDatafromreq(req);
   const { place, checkIn, checkOut, noofpeople, name, phone, price } = req.body;
-   Booking.create({
+  Booking.create({
     place,
     checkIn,
     checkOut,
@@ -215,22 +220,22 @@ app.post("/booking", async(req,res) => {
     name,
     phone,
     price,
-    user:userData.id,
-  }).then((doc)=>{
-   
-    res.json(doc)
-  }).catch((err)=>{
-    throw err
+    user: userData._id,
   })
+    .then((doc) => {
+      res.json(doc);
+    })
+    .catch((err) => {
+      throw err;
+    });
 });
 
+app.get("/bookings", async (req, res) => {
+  const userData = await getUserDatafromreq(req);
+  res.json(await Booking.find({ user: userData.id }).populate("place"));
+});
 
-  app.get("/bookings", async(req, res) => {
-    const userData= await getUserDatafromreq(req)
-    res.json(await Booking.find({user:userData.id}).populate("place"))
-  });
-
-const port = process.env.PORT||4000;
+const port = 4000 || process.env.PORT;
 app.listen(port, () => {
-  console.log("port is running");
+  console.log("port is running",port);
 });
