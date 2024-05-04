@@ -188,9 +188,33 @@ app.get("/places/:id", async (req, res) => {
 });
 
 app.get("/allplaces", async (req, res) => {
-  const allplaces = await Place.find();
+ 
+  const limit=3
+  const page=1
+  const offeset=(page-1)*limit
+  const allplaces = await Place.find().skip(offeset).limit(limit);
   res.json(allplaces);
 });
+app.get("/accomodation/:slug",async(req,res)=>{
+
+  const slug=req.params
+  try{
+
+    const accomodationdetail=await Place.findOne({
+
+      slug:slug
+  
+    })
+
+    res.json(accomodationdetail)
+
+  }catch(err){
+    res.status(500).json({
+      message:err.message
+    })
+  }
+
+})
 
 app.get("/search/:key", async (req, res) => {
   const filterdata = await Place.find({
